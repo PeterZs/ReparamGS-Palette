@@ -4,7 +4,9 @@ Official code for the SIGGRAPH Asia 2026 conference paper:
 
 **Reparametrizing 3D Gaussian Splatting for Real-Time Palette-based Color and Luminance Editing**
 
-[Cheng-Kang Ted Chao](https://github.com/tedchao) and [Yotam Gingold](https://cragl.cs.gmu.edu/)
+[Cheng-Kang Ted Chao](https://mason.gmu.edu/~cchao8/) and [Yotam Gingold](https://cragl.cs.gmu.edu/)
+
+**[Project page](https://cragl.cs.gmu.edu/palettegaussian/)**
 
 This repo reparametrizes a trained 3D Gaussian Splatting scene into a palette-weight representation: each gaussian's color is expressed as weights over a small, automatically extracted color palette. Editing a palette color then re-colors the whole scene coherently in real time, enabling palette-based color and luminance editing (color grading) of 3DGS scenes.
 

@@ -41,14 +41,6 @@ Rendering takes a camera JSON describing the views to render. The `cameras/` fol
   python cameras/blender-camera-json.py --path ../dataset/blender/lego --split test --out lego_test.json
   ```
 
-- **Smooth novel-view paths** — densify an existing camera JSON by linearly interpolating between consecutive views:
-
-  ```bash
-  python cameras/lerp-novel-view.py --cam camera_params.json
-  ```
-
-  This writes `camera_params_w_tcw_ext.json` with the interpolated views inserted.
-
 ## 4. Render for testing
 
 After training, you can render the trained model for testing. Example run:
