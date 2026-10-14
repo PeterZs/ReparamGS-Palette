@@ -23,7 +23,33 @@ python train.py --path ../dataset/supersplats/statue/ --epochs 150
 
 The statue dataset can be downloaded [here](https://drive.google.com/drive/folders/1qA2ndQKxMGNjUO3mg9eFXP_CTukSjyeS?usp=sharing), and other example scenes can be found [here](https://drive.google.com/drive/folders/1GZxc299Z9yB_JhlW5bljQ2Yx2CXCLdFI?usp=sharing).
 
-## 3. Render for testing
+## 3. Camera paths for rendering
+
+Rendering takes a camera JSON describing the views to render. The `cameras/` folder contains scripts to generate one yourself, plus ready-made paths for the example scenes under `cameras/data/supersplat/` (e.g. `statue.json`).
+
+- **From a COLMAP dataset** — convert the binary camera model (`sparse/0/*.bin`) of a dataset into a camera JSON:
+
+  ```bash
+  python cameras/camera-bin-to-json.py --cam ../dataset/supersplats/statue/
+  ```
+
+  This writes `camera_params.json` with one entry per training view.
+
+- **From a Blender dataset** — convert a `transforms_{train,val,test}.json` into a camera JSON:
+
+  ```bash
+  python cameras/blender-camera-json.py --path ../dataset/blender/lego --split test --out lego_test.json
+  ```
+
+- **Smooth novel-view paths** — densify an existing camera JSON by linearly interpolating between consecutive views:
+
+  ```bash
+  python cameras/lerp-novel-view.py --cam camera_params.json
+  ```
+
+  This writes `camera_params_w_tcw_ext.json` with the interpolated views inserted.
+
+## 4. Render for testing
 
 After training, you can render the trained model for testing. Example run:
 
@@ -31,8 +57,8 @@ After training, you can render the trained model for testing. Example run:
 python render_images.py --gs data/statue_final.npy --cam cameras/data/supersplat/statue.json --dir results/statue/ --range 0,10 --white_bg
 ```
 
-The camera JSON for the statue scene can be downloaded [here](https://drive.google.com/file/d/1KQ6mMLSbBjwtfALttIYTcuZbwQqZCEJW/view?usp=sharing), and camera JSONs for other example scenes can be found [here](https://drive.google.com/drive/folders/1yTL9b62hVWhDcUa28nYp_erTH-e1tlfp?usp=sharing).
+This saves the rendered views as PNGs (plus a `render.mp4`) into `--dir`.
 
-## 4. Output
+## 5. Output
 
 After training, a checkpoint such as `statue_final.npy` is created inside the `data/` folder. This checkpoint is the input to the finetuning code in the repo root, which finetunes it into our palette-weights representation for further color grading.

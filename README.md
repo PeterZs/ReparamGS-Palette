@@ -6,9 +6,16 @@ Official code for the SIGGRAPH Asia 2026 conference paper:
 
 [Cheng-Kang Ted Chao](https://github.com/tedchao) and [Yotam Gingold](https://cragl.cs.gmu.edu/)
 
-## Installation
+This repo reparametrizes a trained 3D Gaussian Splatting scene into a palette-weight representation: each gaussian's color is expressed as weights over a small, automatically extracted color palette. Editing a palette color then re-colors the whole scene coherently in real time, enabling palette-based color and luminance editing (color grading) of 3DGS scenes.
 
-### 1. Create the conda environment
+The workflow has two stages:
+
+1. **Train a vanilla 3DGS scene** — go to the [`vanilla_3dgs/`](vanilla_3dgs/) folder and follow its README to train a scene (or render an existing checkpoint for testing).
+2. **Finetune into the palette-weight representation** — come back to this root folder and finetune the vanilla checkpoint with `finetune.py` for palette-based color grading (see below).
+
+> **Note on rasterizers:** vanilla 3DGS and our reparametrized representation use **different CUDA rasterizers**. This root folder and `vanilla_3dgs/` each ship their own `gsplatcu`, and both build a Python package with the same name — installing one replaces the other. Install the rasterizer that matches the stage you are running (each stage's instructions include the install command).
+
+## Installation
 
 Install [conda](https://docs.conda.io/en/latest/miniconda.html) (Miniconda is fine), then create and activate the environment from the `environment.yml` in this repo:
 
@@ -17,22 +24,34 @@ conda env create -f environment.yml
 conda activate colorfulgaussians
 ```
 
-This provides Python 3.9, PyTorch, and all other Python dependencies.
+This provides Python 3.9, PyTorch, and all other Python dependencies. The CUDA rasterizers are *not* part of this step — each stage installs its own (see the note above).
 
-### 2. Build the CUDA rasterizer
+## 1. Train a vanilla 3DGS scene
 
-Build and install `gsplatcu`, the CUDA rasterizer used for rendering, as a PyTorch extension:
+See [`vanilla_3dgs/README.md`](vanilla_3dgs/README.md). It covers installing the vanilla rasterizer, training a scene, generating camera paths, and rendering for testing. Training produces a checkpoint such as `data/statue_final.npy`, which is the input to the next stage.
+
+## 2. Finetune into the palette-weight representation
+
+Back in this root folder, install our rasterizer (this replaces the vanilla one):
 
 ```bash
 pip3 install gsplatcu/.
 ```
 
-This step compiles CUDA sources, so it requires an NVIDIA GPU with the CUDA toolkit installed. You can verify the install with:
+This compiles CUDA sources, so it requires an NVIDIA GPU with the CUDA toolkit installed.
+
+Then finetune a vanilla 3DGS checkpoint into the palette-weight representation. Example run:
 
 ```bash
-python -c "import torch, gsplatcu; print('ok')"
+python finetune.py --gs trained_models/3dgs/supersplats/statue_final.npy \
+    --data dataset/supersplats/statue/ \
+    --num_palette 3 --clamp_start 0.7 \
+    --low_rank --reshape_P 5 --reshape_Q 15 \
+    --convexhull_init --use_fast --epochs 50
 ```
+
+where `--gs` is the vanilla 3DGS checkpoint from stage 1 and `--data` is the same dataset it was trained on. `--num_palette` sets the palette size, `--convexhull_init` initializes the palette from the convex hull of the scene's colors, and `--low_rank` (with `--reshape_P`/`--reshape_Q`) stores the view-dependent weights in a compact low-rank factorization.
 
 ## Acknowledgements
 
-The CUDA rasterizer in `gsplatcu/` is adapted from [EasyGaussianSplatting](https://github.com/scomup/EasyGaussianSplatting) by scomup (Liu Yang). See the license header in those source files for details.
+The CUDA rasterizers in `gsplatcu/` and `vanilla_3dgs/gsplatcu/` are adapted from [EasyGaussianSplatting](https://github.com/scomup/EasyGaussianSplatting) by scomup (Liu Yang). See the license header in those source files for details.
