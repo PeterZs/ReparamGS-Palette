@@ -18,7 +18,7 @@ pip3 install gsplatcu/.
 Example run:
 
 ```bash
-python train.py --path ../dataset/supersplats/statue/ --epochs 150
+python train.py --path ../dataset/supersplats/statue/ --epochs 250
 ```
 
 The statue dataset can be downloaded [here](https://drive.google.com/drive/folders/1qA2ndQKxMGNjUO3mg9eFXP_CTukSjyeS?usp=sharing), and other example scenes can be found [here](https://drive.google.com/drive/folders/1GZxc299Z9yB_JhlW5bljQ2Yx2CXCLdFI?usp=sharing).
