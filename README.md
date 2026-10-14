@@ -54,11 +54,24 @@ python finetune.py --gs trained_models/3dgs/supersplats/statue_final.npy \
 
 where:
 
-- `--gs` is the vanilla 3DGS checkpoint from stage 1.
-- `--data` is the same dataset the checkpoint was trained on.
-- `--num_palette` sets the number of chromatic palette colors (black and white are always included in addition).
-- `--convexhull_init` initializes the palette from the convex hull of the scene's colors.
-- `--low_rank` (with `--reshape_P`/`--reshape_Q`) stores the view-dependent weights in a compact low-rank factorization — see the paper for details.
+- `--gs` is the vanilla 3DGS checkpoint from stage 1 (required).
+- `--data` is the same dataset the checkpoint was trained on (required).
+- `--num_palette` sets the number of chromatic palette colors (black and white are always included in addition). Default: 4.
+- `--convexhull_init` (optional) initializes the palette from a simplified convex hull of the scene's colors instead of the default even-hue initialization.
+- `--low_rank` (optional, with `--reshape_P`/`--reshape_Q`) stores the view-dependent weights in a compact low-rank factorization — see the paper for details. `--use_fast` enables the fused CUDA path for the low-rank mode.
+- `--clamp_start` sets the fraction of training after which the weights are clamped to non-negative and renormalized into a proper convex combination of the palette anchors (e.g. `0.7` starts clamping at 70% through training). Default: 1.0 (off).
+
+Other optional flags:
+
+- `--output` — output checkpoint path. Default: `data/<scene>_palette.npy`.
+- `--epochs` — number of finetuning epochs. Default: 10.
+- `--lambda_pos` — weight of the penalty on negative weights. Default: 0.5.
+- `--lambda_compact`, `--compact_ramp_factor`, `--compact_schedule_start` — weight of the palette compactness loss and its ramp-up schedule. Defaults: 0.001, 5.0, 2/3.
+- `--lambda_sep`, `--min_gap_fraction` — weight of the hue separation regularizer and the minimum hue gap (as a fraction of even spacing). Defaults: 1.0, 0.3.
+- `--lambda_alpha` — weight of the alpha-channel supervision (Blender datasets only). Default: 1.0.
+- `--resize_rate` — resolution multiplier on the training views. Default: 1.0.
+- `--sh_order` — spherical harmonics order. Default: 3.
+- `--dataset_type` — `auto` (default), `colmap`, or `blender`.
 
 ## Acknowledgements
 
