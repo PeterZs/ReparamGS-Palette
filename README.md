@@ -52,7 +52,13 @@ python finetune.py --gs trained_models/3dgs/supersplats/statue_final.npy \
     --convexhull_init --use_fast --epochs 50
 ```
 
-where `--gs` is the vanilla 3DGS checkpoint from stage 1 and `--data` is the same dataset it was trained on. `--num_palette` sets the palette size, `--convexhull_init` initializes the palette from the convex hull of the scene's colors, and `--low_rank` (with `--reshape_P`/`--reshape_Q`) stores the view-dependent weights in a compact low-rank factorization.
+where:
+
+- `--gs` is the vanilla 3DGS checkpoint from stage 1.
+- `--data` is the same dataset the checkpoint was trained on.
+- `--num_palette` sets the number of chromatic palette colors (black and white are always included in addition).
+- `--convexhull_init` initializes the palette from the convex hull of the scene's colors.
+- `--low_rank` (with `--reshape_P`/`--reshape_Q`) stores the view-dependent weights in a compact low-rank factorization — see the paper for details.
 
 ## Acknowledgements
 
